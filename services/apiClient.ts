@@ -1,6 +1,9 @@
 // API client for frontend
-const API_BASE_URL =
-  import.meta.env.VITE_API_URL || "http://localhost:3000/api";
+// Use `VITE_API_URL` when provided; otherwise default to a relative `/api`
+// so the frontend will call the same origin (works when backend is served
+// from the same domain, e.g., Vercel functions at `/api`). If you host the
+// backend separately, set `VITE_API_URL` to the full backend URL.
+const API_BASE_URL = import.meta.env.VITE_API_URL || "/api";
 
 interface RequestOptions extends RequestInit {
   params?: Record<string, any>;
