@@ -1,0 +1,84 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Product {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  unit      String   // Bao, Khối, Viên, Thùng, Cái, Mét, Kg, Lít
+  price     Float
+  category  String   // Xi măng, Cát/Đá, Gạch, Sơn, Ống nước, Thiết bị vệ sinh, Dụng cụ, Khác
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  invoiceItems InvoiceItem[]
+
+  @@index([category])
+  @@index([createdAt])
+}
+
+model Customer {
+  id        String   @id @default(cuid())
+  name      String
+  phone     String   @unique
+  address   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  invoices Invoice[]
+
+  @@index([phone])
+  @@index([createdAt])
+}
+
+model Invoice {
+  id            String   @id @default(cuid())
+  customerId    String?
+  customer      Customer? @relation(fields: [customerId], references: [id])
+  customerName  String   // Snapshot name
+  customerPhone String?  // Snapshot phone
+  date          DateTime @default(now())
+  items         InvoiceItem[]
+  totalAmount   Float
+  note          String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([customerId])
+  @@index([date])
+  @@index([createdAt])
+}
+
+model InvoiceItem {
+  id          String   @id @default(cuid())
+  invoiceId   String
+  invoice     Invoice  @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  productId   String
+  product     Product  @relation(fields: [productId], references: [id])
+  productName String
+  unit        String
+  quantity    Float
+  price       Float
+  total       Float
+  createdAt   DateTime @default(now())
+
+  @@index([invoiceId])
+  @@index([productId])
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String   // hashed
+  name      String
+  role      String   @default("user") // user, admin
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([email])
+}
