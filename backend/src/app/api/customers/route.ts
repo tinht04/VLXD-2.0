@@ -1,8 +1,8 @@
 import { NextRequest } from "next/server";
 import prisma from "@/lib/db/prisma";
-import { success, badRequest, serverError, verifyAuth } from "@/lib/utils/auth";
+import { success, badRequest, serverError } from "@/lib/utils/auth";
 
-export async function GET(request: NextRequest) {
+export async function GET(_request: NextRequest) {
   try {
     const customers = await prisma.customer.findMany({
       orderBy: { createdAt: "desc" },

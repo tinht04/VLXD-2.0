@@ -1,14 +1,15 @@
 import { NextRequest } from "next/server";
 import prisma from "@/lib/db/prisma";
-import { success, badRequest, serverError, verifyAuth } from "@/lib/utils/auth";
+import { success, badRequest, serverError } from "@/lib/utils/auth";
 
 export async function GET(
-  request: NextRequest,
-  { params }: { params: { id: string } }
+  _request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const product = await prisma.product.findUnique({
-      where: { id: params.id },
+      where: { id },
     });
 
     if (!product) {
@@ -23,20 +24,21 @@ export async function GET(
 }
 
 export async function PUT(
-  request: NextRequest,
-  { params }: { params: { id: string } }
+  _request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     // Auth temporarily disabled
     // const user = verifyAuth(request);
     // if (!user) {
     //   return badRequest("Unauthorized");
     // }
 
-    const data = await request.json();
+    const data = await _request.json();
 
     const product = await prisma.product.update({
-      where: { id: params.id },
+      where: { id },
       data,
     });
 
@@ -51,10 +53,11 @@ export async function PUT(
 }
 
 export async function DELETE(
-  request: NextRequest,
-  { params }: { params: { id: string } }
+  _request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     // Auth temporarily disabled
     // const user = verifyAuth(request);
     // if (!user) {
@@ -62,7 +65,7 @@ export async function DELETE(
     // }
 
     await prisma.product.delete({
-      where: { id: params.id },
+      where: { id },
     });
 
     return success({ message: "Product deleted" });

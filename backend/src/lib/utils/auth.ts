@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import * as jwt from "jsonwebtoken";
 
-const JWT_SECRET: string = process.env.JWT_SECRET || 'your-secret-key';
+const JWT_SECRET: string = process.env.JWT_SECRET || "your-secret-key";
 
 export function verifyAuth(request: NextRequest) {
   try {
@@ -19,9 +19,10 @@ export function verifyAuth(request: NextRequest) {
 }
 
 export function createToken(userId: string, email: string) {
+  const expiresIn = process.env.JWT_EXPIRES_IN || "7d";
   return jwt.sign({ userId, email }, JWT_SECRET, {
-    expiresIn: process.env.JWT_EXPIRES_IN || "7d",
-  });
+    expiresIn,
+  } as jwt.SignOptions);
 }
 
 export function unauthorized() {

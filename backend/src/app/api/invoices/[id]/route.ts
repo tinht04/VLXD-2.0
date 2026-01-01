@@ -3,12 +3,13 @@ import prisma from "@/lib/db/prisma";
 import { success, badRequest, serverError } from "@/lib/utils/auth";
 
 export async function GET(
-  request: NextRequest,
-  { params }: { params: { id: string } }
+  _request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const invoice = await prisma.invoice.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         items: true,
         customer: true,
@@ -27,15 +28,16 @@ export async function GET(
 }
 
 export async function PUT(
-  request: NextRequest,
-  { params }: { params: { id: string } }
+  _request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const data = await request.json();
+    const { id } = await params;
+    const data = await _request.json();
     const { customerName, customerPhone, note } = data;
 
     const invoice = await prisma.invoice.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         customerName,
         customerPhone,
@@ -58,12 +60,13 @@ export async function PUT(
 }
 
 export async function DELETE(
-  request: NextRequest,
-  { params }: { params: { id: string } }
+  _request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     await prisma.invoice.delete({
-      where: { id: params.id },
+      where: { id },
     });
 
     return success({ message: "Invoice deleted" });

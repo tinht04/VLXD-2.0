@@ -3,7 +3,28 @@
 // so the frontend will call the same origin (works when backend is served
 // from the same domain, e.g., Vercel functions at `/api`). If you host the
 // backend separately, set `VITE_API_URL` to the full backend URL.
-const API_BASE_URL = import.meta.env.VITE_API_URL || "/api";
+const _RAW_API_URL = import.meta.env.VITE_API_URL;
+let API_BASE_URL = _RAW_API_URL || "/api";
+
+if (typeof window !== "undefined" && _RAW_API_URL) {
+  try {
+    const parsed = new URL(_RAW_API_URL, window.location.origin);
+    // Upgrade insecure scheme when page is HTTPS
+    if (window.location.protocol === "https:" && parsed.protocol === "http:") {
+      parsed.protocol = "https:";
+    }
+
+    // Ensure path contains `/api` if not already present
+    if (!parsed.pathname.includes("/api")) {
+      parsed.pathname = parsed.pathname.replace(/\/$/, "") + "/api";
+    }
+
+    API_BASE_URL = parsed.toString().replace(/\/$/, "");
+  } catch (e) {
+    // fallback to the raw value if URL parsing fails
+    API_BASE_URL = _RAW_API_URL;
+  }
+}
 
 interface RequestOptions extends RequestInit {
   params?: Record<string, any>;
