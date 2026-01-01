@@ -22,23 +22,25 @@ export async function POST(request: NextRequest) {
 
     const { name, phone, address } = data;
 
-    if (!name || !phone) {
-      return badRequest("Missing required fields");
+    if (!name) {
+      return badRequest("Name is required");
     }
 
-    // Check if customer with this phone already exists
-    const existing = await prisma.customer.findUnique({
-      where: { phone },
-    });
+    // Phone is optional - if provided, check if customer with this phone already exists
+    if (phone) {
+      const existing = await prisma.customer.findUnique({
+        where: { phone },
+      });
 
-    if (existing) {
-      return success({ customer: existing }, 200); // Return existing customer
+      if (existing) {
+        return success({ customer: existing }, 200); // Return existing customer
+      }
     }
 
     const customer = await prisma.customer.create({
       data: {
         name,
-        phone,
+        phone: phone || null,
         address: address || null,
       },
     });

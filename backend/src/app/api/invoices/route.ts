@@ -105,6 +105,18 @@ export async function POST(request: NextRequest) {
       0
     );
 
+    // Update product quantities in database
+    for (const item of items) {
+      await prisma.product.update({
+        where: { id: item.productId },
+        data: {
+          quantity: {
+            decrement: item.quantity,
+          },
+        },
+      });
+    }
+
     const invoice = await prisma.invoice.create({
       data: {
         customerId: finalCustomerId,

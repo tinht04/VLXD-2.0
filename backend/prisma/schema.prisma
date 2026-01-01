@@ -12,6 +12,7 @@ model Product {
   name      String   @unique
   unit      String   // Bao, Khối, Viên, Thùng, Cái, Mét, Kg, Lít
   price     Float
+  quantity  Float    @default(0) // Số lượng tồn kho
   category  String   // Xi măng, Cát/Đá, Gạch, Sơn, Ống nước, Thiết bị vệ sinh, Dụng cụ, Khác
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -25,7 +26,7 @@ model Product {
 model Customer {
   id        String   @id @default(cuid())
   name      String
-  phone     String   @unique
+  phone     String?  @unique
   address   String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -39,7 +40,7 @@ model Customer {
 model Invoice {
   id            String   @id @default(cuid())
   customerId    String?
-  customer      Customer? @relation(fields: [customerId], references: [id])
+  customer      Customer? @relation(fields: [customerId], references: [id], onDelete: SetNull)
   customerName  String   // Snapshot name
   customerPhone String?  // Snapshot phone
   date          DateTime @default(now())
@@ -59,7 +60,7 @@ model InvoiceItem {
   invoiceId   String
   invoice     Invoice  @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
   productId   String
-  product     Product  @relation(fields: [productId], references: [id])
+  product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
   productName String
   unit        String
   quantity    Float

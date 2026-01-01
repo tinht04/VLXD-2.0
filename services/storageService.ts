@@ -63,6 +63,15 @@ export const StorageService = {
     }
   },
 
+  deleteCustomer: async (id: string): Promise<void> => {
+    try {
+      await API.customers.delete(id);
+    } catch (error) {
+      console.error("Failed to delete customer:", error);
+      throw error;
+    }
+  },
+
   // INVOICES API
   getInvoices: async (): Promise<Invoice[]> => {
     try {
@@ -78,9 +87,20 @@ export const StorageService = {
     try {
       // API will handle customer creation if needed
       const response: any = await API.invoices.create(invoice);
+      // Reload products to reflect quantity changes after invoice creation
+      await StorageService.getProducts();
       return response.invoice;
     } catch (error) {
       console.error("Failed to create invoice:", error);
+      throw error;
+    }
+  },
+
+  deleteInvoice: async (id: string): Promise<void> => {
+    try {
+      await API.invoices.delete(id);
+    } catch (error) {
+      console.error("Failed to delete invoice:", error);
       throw error;
     }
   },

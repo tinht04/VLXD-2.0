@@ -100,7 +100,7 @@ export const InvoiceCreator: React.FC<InvoiceCreatorProps> = ({ onSaved }) => {
 
   const handleSaveInvoice = async () => {
     if (cart.length === 0) {
-      alert("Chưa có sản phẩm nào trong giỏ hàng!");
+      alert("❌ Chưa có sản phẩm nào trong giỏ hàng!");
       return;
     }
 
@@ -108,11 +108,19 @@ export const InvoiceCreator: React.FC<InvoiceCreatorProps> = ({ onSaved }) => {
     if (!finalName) {
       if (
         !confirm(
-          "Bạn chưa nhập tên khách hàng. Tiếp tục lưu dưới tên 'Khách lẻ'?"
+          "⚠️ Bạn chưa nhập tên khách hàng. Tiếp tục lưu dưới tên 'Khách lẻ'?"
         )
       )
         return;
       finalName = "Khách lẻ";
+    }
+
+    // If creating a new customer, phone is optional but we'll warn if not provided
+    if (selectedCustomerId === "new" && !customerPhone.trim()) {
+      if (
+        !confirm("💡 Bạn chưa nhập số điện thoại khách hàng mới. Tiếp tục lưu?")
+      )
+        return;
     }
 
     setSaving(true);
@@ -143,7 +151,7 @@ export const InvoiceCreator: React.FC<InvoiceCreatorProps> = ({ onSaved }) => {
       };
 
       await StorageService.saveInvoice(newInvoice);
-      alert("Đã lưu hóa đơn thành công!");
+      alert("✅ Đã lưu hóa đơn thành công!");
 
       // Reset form
       setSelectedCustomerId("");
@@ -156,8 +164,9 @@ export const InvoiceCreator: React.FC<InvoiceCreatorProps> = ({ onSaved }) => {
       setCustomers(updatedCustomers);
 
       onSaved();
-    } catch (e) {
-      alert("Lỗi khi lưu dữ liệu!");
+    } catch (e: any) {
+      const errorMessage = e?.message || "Có lỗi xảy ra khi lưu hóa đơn!";
+      alert("❌ " + errorMessage);
     } finally {
       setSaving(false);
     }

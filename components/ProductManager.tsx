@@ -49,7 +49,26 @@ export const ProductManager: React.FC = () => {
   };
 
   const handleSaveProduct = async () => {
-    if (!newName || !newPrice) return;
+    // Validation
+    const errors: string[] = [];
+
+    if (!newName.trim()) {
+      errors.push("Tên sản phẩm không được để trống");
+    }
+
+    if (!newPrice) {
+      errors.push("Giá không được để trống");
+    }
+
+    if (newPrice && parseFloat(newPrice.replace(/\./g, "")) <= 0) {
+      errors.push("Giá phải lớn hơn 0");
+    }
+
+    if (errors.length > 0) {
+      alert("❌ Lỗi nhập liệu:\n• " + errors.join("\n• "));
+      return;
+    }
+
     setSaving(true);
 
     try {
@@ -60,6 +79,7 @@ export const ProductManager: React.FC = () => {
           name: newName,
           unit: newUnit,
           price: parseFloat(newPrice.replace(/\./g, "")),
+          quantity: 0,
           category: newCategory,
         };
         await StorageService.updateProduct(updatedProduct);
@@ -70,6 +90,7 @@ export const ProductManager: React.FC = () => {
           name: newName,
           unit: newUnit,
           price: parseFloat(newPrice.replace(/\./g, "")),
+          quantity: 0,
           category: newCategory,
         };
         await StorageService.saveProduct(newProduct);
@@ -77,20 +98,33 @@ export const ProductManager: React.FC = () => {
 
       await loadProducts();
       resetForm();
-    } catch (e) {
-      alert("Có lỗi xảy ra khi lưu dữ liệu.");
+    } catch (e: any) {
+      const errorMessage = e?.message || "Có lỗi xảy ra khi lưu dữ liệu.";
+      alert("❌ " + errorMessage);
     } finally {
       setSaving(false);
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm("Bạn có chắc chắn muốn xóa sản phẩm này?")) return;
+  const handleDelete = async (id: string, name: string) => {
+    if (
+      !confirm(
+        `⚠️ Bạn có chắc chắn muốn xóa sản phẩm "${name}"?\n\nHành động này không thể hoàn tác!`
+      )
+    )
+      return;
     setSaving(true);
-    await StorageService.deleteProduct(id);
-    await loadProducts();
-    if (editingId === id) resetForm(); // Reset if deleting the item currently being edited
-    setSaving(false);
+    try {
+      await StorageService.deleteProduct(id);
+      await loadProducts();
+      if (editingId === id) resetForm();
+      alert("✅ Đã xóa sản phẩm thành công!");
+    } catch (error: any) {
+      const errorMessage = error?.message || "Không thể xóa sản phẩm!";
+      alert("❌ " + errorMessage);
+    } finally {
+      setSaving(false);
+    }
   };
 
   if (loading && products.length === 0) {
@@ -225,6 +259,7 @@ export const ProductManager: React.FC = () => {
               <th className="p-3">Danh Mục</th>
               <th className="p-3 text-center">ĐVT</th>
               <th className="p-3 text-right">Đơn Giá</th>
+              <th className="p-3 text-center">Tồn Kho</th>
               <th className="p-3 rounded-tr-lg text-center">Hành Động</th>
             </tr>
           </thead>
@@ -256,6 +291,17 @@ export const ProductManager: React.FC = () => {
                   {product.price.toLocaleString("vi-VN")} đ
                 </td>
                 <td className="p-3 text-center">
+                  <span
+                    className={`text-sm font-semibold px-2 py-1 rounded-full ${
+                      (product.quantity ?? 0) <= 5
+                        ? "bg-red-100 text-red-700"
+                        : "bg-green-100 text-green-700"
+                    }`}
+                  >
+                    {(product.quantity ?? 0).toLocaleString("vi-VN")}
+                  </span>
+                </td>
+                <td className="p-3 text-center">
                   <div className="flex items-center justify-center space-x-2">
                     <button
                       onClick={() => handleEditClick(product)}
@@ -265,7 +311,7 @@ export const ProductManager: React.FC = () => {
                       <Pencil className="h-4 w-4" />
                     </button>
                     <button
-                      onClick={() => handleDelete(product.id)}
+                      onClick={() => handleDelete(product.id, product.name)}
                       className="text-red-500 hover:text-red-700 hover:bg-red-50 p-1.5 rounded transition-colors"
                       title="Xóa"
                     >

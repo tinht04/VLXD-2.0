@@ -1,9 +1,9 @@
-
 export interface Product {
   id: string;
   name: string;
   unit: string; // e.g., Bao, Khối, Thùng, Cái
   price: number;
+  quantity: number; // Tồn kho
   category: string;
 }
 
@@ -34,7 +34,30 @@ export interface Invoice {
   note?: string;
 }
 
-export type ViewState = 'DASHBOARD' | 'INVOICE' | 'PRODUCTS' | 'REPORTS' | 'SETTINGS';
+export type ViewState =
+  | "DASHBOARD"
+  | "INVOICE"
+  | "PRODUCTS"
+  | "REPORTS"
+  | "SETTINGS";
 
-export const UNITS = ['Bao', 'Khối', 'Viên', 'Thùng', 'Cái', 'Mét', 'Kg', 'Lít'];
-export const CATEGORIES = ['Xi măng', 'Cát/Đá', 'Gạch', 'Sơn', 'Ống nước', 'Thiết bị vệ sinh', 'Dụng cụ', 'Khác'];
+export const UNITS = [
+  "Bao",
+  "Khối",
+  "Viên",
+  "Thùng",
+  "Cái",
+  "Mét",
+  "Kg",
+  "Lít",
+];
+export const CATEGORIES = [
+  "Xi măng",
+  "Cát/Đá",
+  "Gạch",
+  "Sơn",
+  "Ống nước",
+  "Thiết bị vệ sinh",
+  "Dụng cụ",
+  "Khác",
+];
