@@ -101,8 +101,7 @@ export const ProductManager: React.FC = () => {
           name: newName,
           unit: newUnit,
           price: parseFloat(newPrice.replace(/\./g, "")),
-          quantity: parseFloat(newQuantity)eFloat(newPrice.replace(/\./g, "")),
-          quantity: 0,
+          quantity: parseFloat(newQuantity),
           category: newCategory,
         };
         await StorageService.saveProduct(newProduct);
@@ -249,9 +248,7 @@ export const ProductManager: React.FC = () => {
             />
           </div>
           <div>
-            <label className="text-xs text-slate-500 block mb-1">
-              Tồn kho
-            </label>
+            <label className="text-xs text-slate-500 block mb-1">Tồn kho</label>
             <input
               type="number"
               inputMode="decimal"
