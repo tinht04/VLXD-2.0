@@ -13,6 +13,7 @@ export const ProductManager: React.FC = () => {
   const [newName, setNewName] = useState("");
   const [newUnit, setNewUnit] = useState(UNITS[0]);
   const [newPrice, setNewPrice] = useState("");
+  const [newQuantity, setNewQuantity] = useState("");
   const [newCategory, setNewCategory] = useState(CATEGORIES[0]);
 
   useEffect(() => {
@@ -31,6 +32,7 @@ export const ProductManager: React.FC = () => {
     setNewName("");
     setNewUnit(UNITS[0]);
     setNewPrice("");
+    setNewQuantity("");
     setNewCategory(CATEGORIES[0]);
   };
 
@@ -39,6 +41,7 @@ export const ProductManager: React.FC = () => {
     setNewName(product.name);
     setNewUnit(product.unit);
     setNewPrice(product.price.toLocaleString("vi-VN"));
+    setNewQuantity(product.quantity.toString());
     setNewCategory(product.category);
     // Scroll to top for better UX on mobile
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -63,6 +66,13 @@ export const ProductManager: React.FC = () => {
     if (newPrice && parseFloat(newPrice.replace(/\./g, "")) <= 0) {
       errors.push("Giá phải lớn hơn 0");
     }
+!newQuantity) {
+      errors.push("Số lượng không được để trống");
+    }
+
+    if (newQuantity && parseFloat(newQuantity) < 0) {
+      errors.push("Số lượng không được âm");
+    }
 
     if (errors.length > 0) {
       alert("❌ Lỗi nhập liệu:\n• " + errors.join("\n• "));
@@ -79,7 +89,7 @@ export const ProductManager: React.FC = () => {
           name: newName,
           unit: newUnit,
           price: parseFloat(newPrice.replace(/\./g, "")),
-          quantity: 0,
+          quantity: parseFloat(newQuantity),
           category: newCategory,
         };
         await StorageService.updateProduct(updatedProduct);
@@ -90,6 +100,7 @@ export const ProductManager: React.FC = () => {
           name: newName,
           unit: newUnit,
           price: parseFloat(newPrice.replace(/\./g, "")),
+          quantity: parseFloat(newQuantity)eFloat(newPrice.replace(/\./g, "")),
           quantity: 0,
           category: newCategory,
         };
@@ -173,7 +184,7 @@ export const ProductManager: React.FC = () => {
           )}
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
+        <div className="grid grid-cols-1 md:grid-cols-6 gap-4 items-end">
           <div className="md:col-span-2">
             <label className="text-xs text-slate-500 block mb-1">
               Tên vật liệu
@@ -234,6 +245,21 @@ export const ProductManager: React.FC = () => {
                 const formatted = digits.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
                 setNewPrice(formatted);
               }}
+            />
+          </div>
+          <div>
+            <label className="text-xs text-slate-500 block mb-1">
+              Tồn kho
+            </label>
+            <input
+              type="number"
+              inputMode="decimal"
+              className="w-full p-2 border border-slate-300 rounded focus:ring-2 focus:ring-blue-500 outline-none"
+              placeholder="0"
+              value={newQuantity}
+              onChange={(e) => setNewQuantity(e.target.value)}
+              min="0"
+              step="0.01"
             />
           </div>
           <button
