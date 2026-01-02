@@ -66,7 +66,8 @@ export const ProductManager: React.FC = () => {
     if (newPrice && parseFloat(newPrice.replace(/\./g, "")) <= 0) {
       errors.push("Giá phải lớn hơn 0");
     }
-!newQuantity) {
+
+    if (!newQuantity) {
       errors.push("Số lượng không được để trống");
     }
 
